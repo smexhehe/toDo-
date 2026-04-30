@@ -1,2 +1,10 @@
 tmp/
 *.exe
+*.test
+coverage.out
+*.log
+.env
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
