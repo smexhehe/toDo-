@@ -1,0 +1,6 @@
+.git
+tmp
+data/tasks.json
+*.exe
+*.test
+coverage.out

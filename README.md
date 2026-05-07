@@ -61,6 +61,27 @@ The file is ignored by Git because it contains local runtime data.
 go test ./...
 ```
 
+## Docker
+
+Build image:
+
+```bash
+docker build -t todo-api .
+```
+
+Run container:
+
+```bash
+docker run --rm -p 8080:8080 todo-api
+```
+
+Run with local data persistence:
+
+```bash
+docker run --rm -p 8080:8080 -v ${PWD}/data:/app/data todo-api
+```
+
+
 ## API Endpoints
 
 | Method | Endpoint | Description |

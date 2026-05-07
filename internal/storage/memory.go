@@ -44,6 +44,10 @@ func DeleteTask(id int) bool {
 }
 
 func GetTasks() []models.Task {
+	if Tasks == nil {
+		return []models.Task{}
+	}
+
 	return Tasks
 }
 

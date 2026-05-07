@@ -190,3 +190,15 @@ func TestTaskByIDHandlerPatchTaskEmptyTitle(t *testing.T) {
 	require.Equal(t, "old", storage.Tasks[0].Title)
 	require.False(t, storage.Tasks[0].Done)
 }
+
+func TestTaskHandlerGetTasksEmpty(t *testing.T) {
+	storage.Tasks = nil
+
+	req := httptest.NewRequest(http.MethodGet, "/task", nil)
+	rr := httptest.NewRecorder()
+
+	TaskHandler(rr, req)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+	require.JSONEq(t, `[]`, rr.Body.String())
+}
