@@ -11,6 +11,10 @@ import (
 
 var tasksFile = "data/tasks.json"
 
+func SetTasksFile(path string) {
+	tasksFile = path
+}
+
 type errorResponse struct {
 	Error string `json:"error"`
 }

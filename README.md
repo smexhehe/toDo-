@@ -11,6 +11,11 @@ Simple REST API for managing todo tasks written in Go.
 - File-backed JSON storage
 - Tasks are loaded on startup and saved after changes
 - Unit tests for handlers and storage
+- HTTP server timeouts
+- Graceful shutdown on Ctrl+C
+- Configuration via environment variables
+
+
 
 ## Tech Stack
 
@@ -21,6 +26,22 @@ Simple REST API for managing todo tasks written in Go.
 ## Run
 
 ```bash
+go run ./cmd/todo
+```
+## Configuration
+
+The server can be configured with environment variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| TODO_ADDR | :8080 | HTTP server address |
+| TODO_TASKS_FILE | data/tasks.json | Path to JSON storage file |
+
+PowerShell example:
+
+```powershell
+$env:TODO_ADDR=":3000"
+$env:TODO_TASKS_FILE="data/dev-tasks.json"
 go run ./cmd/todo
 ```
 

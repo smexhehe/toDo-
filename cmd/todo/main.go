@@ -14,7 +14,19 @@ import (
 )
 
 func main() {
-	err := storage.LoadTasks("data/tasks.json")
+	addr := os.Getenv("TODO_ADDR")
+	if addr == "" {
+		addr = ":8080"
+	}
+
+	tasksFile := os.Getenv("TODO_TASKS_FILE")
+	if tasksFile == "" {
+		tasksFile = "data/tasks.json"
+	}
+
+	handlers.SetTasksFile(tasksFile)
+
+	err := storage.LoadTasks(tasksFile)
 	if err != nil {
 		fmt.Println("Error loading tasks:", err)
 	}
@@ -23,65 +35,35 @@ func main() {
 	http.HandleFunc("/task/", handlers.TaskByIDHandler)
 
 	fmt.Println("Start server")
-	// Создаём HTTP-сервер
+
 	server := &http.Server{
-		// Адрес и порт, которые будет слушать сервер
-		Addr: ":8080",
-		// Максимальное время чтения запроса от клиента
-		ReadTimeout: 5 * time.Second,
-		// Максимальное время записи ответа клиенту
+		Addr:         addr,
+		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		// nil = использовать http.DefaultServeMux
-		// (маршруты, зарегистрированные через http.HandleFunc)
-		Handler: nil,
+		Handler:      nil,
 	}
 
-	// Запускаем сервер в отдельной goroutine,
-	// чтобы main goroutine могла продолжить выполнение
+	// Run the server in a goroutine so main can wait for shutdown signals.
 	go func() {
-		// Запускаем HTTP-сервер
-		// ListenAndServe блокирует выполнение,
-		// пока сервер работает
 		err := server.ListenAndServe()
-
-		// Проверяем ошибку
-		// http.ErrServerClosed возникает при нормальном Shutdown()
-		// и не считается настоящей ошибкой
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			fmt.Println("Error starting the server:", err)
 		}
 	}()
 
-	// Создаём канал для получения сигналов ОС
+	// Wait until the process receives Ctrl+C or a termination signal.
 	stop := make(chan os.Signal, 1)
-
-	// Подписываемся на сигналы:
-	// os.Interrupt -> Ctrl+C
-	// syscall.SIGTERM -> сигнал завершения процесса
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-
-	// Блокируем main goroutine,
-	// ждём сигнал завершения
 	<-stop
 
 	fmt.Println("Shutting down server...")
 
-	// Создаём контекст с timeout 5 секунд
-	// Shutdown будет ждать завершения активных запросов
-	// максимум 5 секунд
+	// Give active requests a short window to finish before stopping the server.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-
-	// Освобождение ресурсов контекста
 	defer cancel()
 
-	// Graceful shutdown:
-	//
-	// 1. Перестаёт принимать новые подключения
-	// 2. Ждёт завершения текущих запросов
-	// 3. Закрывает соединения
 	err = server.Shutdown(ctx)
 	if err != nil {
 		fmt.Println("Error shutting down server:", err)
 	}
-
 }
