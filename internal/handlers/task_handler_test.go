@@ -12,7 +12,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func setupTasksFile(t *testing.T) {
+	t.Helper()
+
+	oldTasksFile := tasksFile
+	tasksFile = t.TempDir() + "/tasks.json"
+
+	t.Cleanup(func() {
+		tasksFile = oldTasksFile
+	})
+}
+
 func TestTaskHandlerCreateTask(t *testing.T) {
+	setupTasksFile(t)
 	storage.Tasks = nil
 
 	req := httptest.NewRequest(http.MethodPost, "/task", strings.NewReader(`{"title":"test","done":false}`))
@@ -76,6 +88,7 @@ func TestTaskByIDHandlerGetTaskNotFound(t *testing.T) {
 }
 
 func TestTaskByIDHandlerUpdateTask(t *testing.T) {
+	setupTasksFile(t)
 	storage.Tasks = []models.Task{
 		{ID: 1, Title: "old", Done: false},
 	}
@@ -94,6 +107,7 @@ func TestTaskByIDHandlerUpdateTask(t *testing.T) {
 }
 
 func TestTaskByIDHandlerDeleteTask(t *testing.T) {
+	setupTasksFile(t)
 	storage.Tasks = []models.Task{
 		{ID: 1, Title: "test", Done: false},
 	}

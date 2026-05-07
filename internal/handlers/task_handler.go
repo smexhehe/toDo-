@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+var tasksFile = "data/tasks.json"
+
 type errorResponse struct {
 	Error string `json:"error"`
 }
@@ -32,6 +34,12 @@ func TaskHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		createdTask := storage.CreateTask(newTask)
+
+		err = storage.SaveTasks(tasksFile)
+		if err != nil {
+			writeJSONError(w, "failed to save tasks", http.StatusInternalServerError)
+			return
+		}
 		writeJSON(w, http.StatusCreated, createdTask)
 
 	default:
@@ -78,7 +86,11 @@ func TaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 			writeJSONError(w, "task not found", http.StatusNotFound)
 			return
 		}
-
+		err = storage.SaveTasks(tasksFile)
+		if err != nil {
+			writeJSONError(w, "failed to save tasks", http.StatusInternalServerError)
+			return
+		}
 		writeJSON(w, http.StatusOK, task)
 
 	case http.MethodDelete:
@@ -87,7 +99,11 @@ func TaskByIDHandler(w http.ResponseWriter, r *http.Request) {
 			writeJSONError(w, "task not found", http.StatusNotFound)
 			return
 		}
-
+		err = storage.SaveTasks(tasksFile)
+		if err != nil {
+			writeJSONError(w, "failed to save tasks", http.StatusInternalServerError)
+			return
+		}
 		w.WriteHeader(http.StatusNoContent)
 		return
 

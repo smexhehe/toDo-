@@ -8,3 +8,4 @@ coverage.out
 Thumbs.db
 .vscode/
 .idea/
+data/tasks.json

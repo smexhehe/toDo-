@@ -2,6 +2,7 @@ package storage
 
 import (
 	"TODO/internal/models"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -107,4 +108,59 @@ func TestDeleteTaskNotFound(t *testing.T) {
 	require.False(t, ok)
 	require.Len(t, Tasks, 1)
 	require.Equal(t, 1, Tasks[0].ID)
+}
+
+func TestLoadTasks(t *testing.T) {
+	Tasks = nil
+
+	file := t.TempDir() + "/tasks.json"
+
+	err := os.WriteFile(
+		file,
+		[]byte(`[{"id":1,"title":"from file","done":true}]`),
+		0644,
+	)
+	require.NoError(t, err)
+
+	err = LoadTasks(file)
+	require.NoError(t, err)
+
+	require.Len(t, Tasks, 1)
+	require.Equal(t, 1, Tasks[0].ID)
+	require.Equal(t, "from file", Tasks[0].Title)
+	require.True(t, Tasks[0].Done)
+}
+
+func TestSaveTasks(t *testing.T) {
+	Tasks = []models.Task{
+		{ID: 1, Title: "saved", Done: true},
+	}
+
+	file := t.TempDir() + "/tasks.json"
+
+	err := SaveTasks(file)
+	require.NoError(t, err)
+
+	Tasks = nil
+
+	err = LoadTasks(file)
+	require.NoError(t, err)
+
+	require.Len(t, Tasks, 1)
+	require.Equal(t, 1, Tasks[0].ID)
+	require.Equal(t, "saved", Tasks[0].Title)
+	require.True(t, Tasks[0].Done)
+}
+
+func TestCreateTaskAfterDeleteUsesNextID(t *testing.T) {
+	Tasks = []models.Task{
+		{ID: 2, Title: "existing", Done: false},
+	}
+
+	createdTask := CreateTask(models.Task{
+		Title: "new",
+		Done:  false,
+	})
+
+	require.Equal(t, 3, createdTask.ID)
 }

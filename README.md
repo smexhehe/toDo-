@@ -8,7 +8,8 @@ Simple REST API for managing todo tasks written in Go.
 - JSON responses
 - JSON error format
 - Request validation
-- In-memory storage
+- File-backed JSON storage
+- Tasks are loaded on startup and saved after changes
 - Unit tests for handlers and storage
 
 ## Tech Stack
@@ -22,6 +23,16 @@ Simple REST API for managing todo tasks written in Go.
 ```bash
 go run ./cmd/todo
 ```
+
+## Data Storage
+
+Tasks are stored in:
+
+```text
+data/tasks.json
+```
+
+The file is ignored by Git because it contains local runtime data.
 
 ## Test
 

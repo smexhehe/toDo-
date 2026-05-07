@@ -5,7 +5,7 @@ import "TODO/internal/models"
 var Tasks []models.Task
 
 func CreateTask(task models.Task) models.Task {
-	task.ID = len(Tasks) + 1
+	task.ID = nextID()
 	Tasks = append(Tasks, task)
 	return task
 }
@@ -45,4 +45,16 @@ func DeleteTask(id int) bool {
 
 func GetTasks() []models.Task {
 	return Tasks
+}
+
+func nextID() int {
+	maxID := 0
+
+	for i := range Tasks {
+		if Tasks[i].ID > maxID {
+			maxID = Tasks[i].ID
+		}
+	}
+
+	return maxID + 1
 }
