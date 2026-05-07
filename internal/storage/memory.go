@@ -58,3 +58,18 @@ func nextID() int {
 
 	return maxID + 1
 }
+
+func PatchTask(id int, patch models.TaskPatch) (models.Task, bool) {
+	for i := range Tasks {
+		if Tasks[i].ID == id {
+			if patch.Title != nil {
+				Tasks[i].Title = *patch.Title
+			}
+			if patch.Done != nil {
+				Tasks[i].Done = *patch.Done
+			}
+			return Tasks[i], true
+		}
+	}
+	return models.Task{}, false
+}

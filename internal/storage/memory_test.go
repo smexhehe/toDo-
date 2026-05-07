@@ -164,3 +164,23 @@ func TestCreateTaskAfterDeleteUsesNextID(t *testing.T) {
 
 	require.Equal(t, 3, createdTask.ID)
 }
+
+func TestPatchTaskDone(t *testing.T) {
+	Tasks = []models.Task{
+		{ID: 1, Title: "old", Done: false},
+	}
+
+	done := true
+
+	task, ok := PatchTask(1, models.TaskPatch{
+		Done: &done,
+	})
+
+	require.True(t, ok)
+	require.Equal(t, 1, task.ID)
+	require.Equal(t, "old", task.Title)
+	require.True(t, task.Done)
+
+	require.Equal(t, "old", Tasks[0].Title)
+	require.True(t, Tasks[0].Done)
+}

@@ -117,3 +117,76 @@ func TestTaskByIDHandlerDeleteTask(t *testing.T) {
 	require.Equal(t, http.StatusNoContent, rr.Code)
 	require.Len(t, storage.Tasks, 0)
 }
+
+func TestTaskByIDHandlerPatchTaskDone(t *testing.T) {
+	setupTasksFile(t)
+
+	storage.Tasks = []models.Task{
+		{ID: 1, Title: "old", Done: false},
+	}
+
+	req := httptest.NewRequest(http.MethodPatch, "/task/1", strings.NewReader(`{"done":true}`))
+	rr := httptest.NewRecorder()
+
+	TaskByIDHandler(rr, req)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+
+	var task models.Task
+	err := json.NewDecoder(rr.Body).Decode(&task)
+	require.NoError(t, err)
+
+	require.Equal(t, 1, task.ID)
+	require.Equal(t, "old", task.Title)
+	require.True(t, task.Done)
+
+	require.Equal(t, "old", storage.Tasks[0].Title)
+	require.True(t, storage.Tasks[0].Done)
+}
+
+func TestTaskByIDHandlerPatchTaskTitle(t *testing.T) {
+	setupTasksFile(t)
+
+	storage.Tasks = []models.Task{
+		{ID: 1, Title: "old", Done: false},
+	}
+
+	req := httptest.NewRequest(http.MethodPatch, "/task/1", strings.NewReader(`{"title":"new"}`))
+	rr := httptest.NewRecorder()
+
+	TaskByIDHandler(rr, req)
+
+	require.Equal(t, http.StatusOK, rr.Code)
+
+	var task models.Task
+	err := json.NewDecoder(rr.Body).Decode(&task)
+	require.NoError(t, err)
+
+	require.Equal(t, 1, task.ID)
+	require.Equal(t, "new", task.Title)
+	require.False(t, task.Done)
+
+	require.Equal(t, "new", storage.Tasks[0].Title)
+	require.False(t, storage.Tasks[0].Done)
+}
+
+func TestTaskByIDHandlerPatchTaskEmptyTitle(t *testing.T) {
+	storage.Tasks = []models.Task{
+		{ID: 1, Title: "old", Done: false},
+	}
+
+	req := httptest.NewRequest(http.MethodPatch, "/task/1", strings.NewReader(`{"title":""}`))
+	rr := httptest.NewRecorder()
+
+	TaskByIDHandler(rr, req)
+
+	require.Equal(t, http.StatusBadRequest, rr.Code)
+
+	var response errorResponse
+	err := json.NewDecoder(rr.Body).Decode(&response)
+	require.NoError(t, err)
+	require.Equal(t, "title is required", response.Error)
+
+	require.Equal(t, "old", storage.Tasks[0].Title)
+	require.False(t, storage.Tasks[0].Done)
+}

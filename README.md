@@ -47,8 +47,10 @@ go test ./...
 | GET | /task | Get all tasks |
 | POST | /task | Create task |
 | GET | /task/{id} | Get task by ID |
-| PUT | /task/{id} | Update task |
+| PUT | /task/{id} | Replace task |
+| PATCH | /task/{id} | Partially update task |
 | DELETE | /task/{id} | Delete task |
+
 
 ## Example Request
 
