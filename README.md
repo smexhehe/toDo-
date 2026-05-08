@@ -1,5 +1,7 @@
 # Todo API
 
+![CI](https://github.com/smexhehe/toDo-/actions/workflows/ci.yml/badge.svg)
+
 Simple REST API for managing todo tasks written in Go.
 
 ## Features
