@@ -95,6 +95,41 @@ docker run --rm -p 8080:8080 -v ${PWD}/data:/app/data todo-api
 | PATCH | /task/{id} | Partially update task |
 | DELETE | /task/{id} | Delete task |
 
+## Curl Examples
+
+Create a task:
+
+```bash
+curl -X POST http://localhost:8080/task \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Learn Go","done":false}'
+```
+
+Get all tasks:
+
+```bash
+curl http://localhost:8080/task
+```
+
+Get task by ID:
+
+```bash
+curl http://localhost:8080/task/1
+```
+
+Partially update a task:
+
+```bash
+curl -X PATCH http://localhost:8080/task/1 \
+  -H "Content-Type: application/json" \
+  -d '{"done":true}'
+```
+
+Delete a task:
+
+```bash
+curl -X DELETE http://localhost:8080/task/1
+```
 
 ## Example Request
 
